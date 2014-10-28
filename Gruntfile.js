@@ -29,19 +29,20 @@ module.exports = function(grunt) {
             livereload: {
                 options: {
                     open: true,
-                    base: [ base ]
+                    base: [base]
                 }
             }
         },
         jshint: {
             options: {
-                jshintrc: '.jshintrc'
+                jshintrc: '.jshintrc',
+                force: true
             },
-            all: [ base + '/js/*.js' ]
+            all: [base + '/js/*.js']
         },
         jsonlint: {
-            pkg: [ 'package.json' ],
-            bower: [ '{bower,bowercopy}.json' ]
+            pkg: ['package.json'],
+            bower: ['{bower,bowercopy}.json']
         },
         watch: {
             // Watch javascript files for linting
@@ -72,7 +73,7 @@ module.exports = function(grunt) {
         }
     });
 
-    grunt.registerTask('serve', function () {
+    grunt.registerTask('serve', function() {
         grunt.task.run([
             'connect:livereload',
             'watch'
