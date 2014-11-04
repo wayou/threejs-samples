@@ -1,4 +1,4 @@
-  var stats = initStats();
+var stats = initStats();
 
         // create a scene, that will hold all our elements such as objects, cameras and lights.
         var scene = new THREE.Scene();
@@ -72,10 +72,11 @@
                 cube.castShadow = true;
                 cube.name = "cube-" + scene.children.length;
 
+
                 // position the cube randomly in the scene
-                cube.position.x=-30 + Math.round((Math.random() * (planeGeometry.width||planeGeometry.parameters.width)));
+                cube.position.x=-30 + Math.round((Math.random() * planeGeometry.parameters.width));
                 cube.position.y= Math.round((Math.random() * 5));
-                cube.position.z=-20 + Math.round((Math.random() * (planeGeometry.height||planeGeometry.parameters.height)));
+                cube.position.z=-20 + Math.round((Math.random() * planeGeometry.parameters.height));
 
                 // add the cube to the scene
                 scene.add(cube);
