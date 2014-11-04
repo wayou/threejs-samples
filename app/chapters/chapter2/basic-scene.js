@@ -67,13 +67,12 @@ var Control = function() {
     this.logObj = function() {
         console.log(scene.children);
     };
-
 }
 
 var control = new Control();
 var gui = new dat.GUI();
 gui.add(control, 'rotationSpeed', 0, 0.1);
-gui.add(control, 'objectCnt');
+gui.add(control, 'objectCnt').listen();
 gui.add(control, 'addCube');
 gui.add(control, 'removeLastCube');
 gui.add(control, 'logObj');
