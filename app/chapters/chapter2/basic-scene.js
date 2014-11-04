@@ -1,132 +1,94 @@
-var stats = initStats();
+var scene = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.x = -40;
+camera.position.y = 50;
+camera.position.z = 70;
+camera.lookAt(scene.position);
 
-        // create a scene, that will hold all our elements such as objects, cameras and lights.
-        var scene = new THREE.Scene();
+var renderer = new THREE.WebGLRenderer();
+renderer.setClearColor(0xffffff);
+renderer.setSize(window.innerWidth, window.innerHeight);
 
-        // create a camera, which defines where we're looking at.
-        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+var planeGeometry = new THREE.PlaneGeometry(60, 40);
+var planeMaterial = new THREE.MeshLambertMaterial({
+    color: 0xffffff
+});
 
-        // create a render and set the size
-        var renderer = new THREE.WebGLRenderer();
+var plane = new THREE.Mesh(planeGeometry, planeMaterial);
+plane.rotation.x = -0.5 * Math.PI;
+plane.receiveSahdow = true;
+scene.add(plane);
 
-        renderer.setClearColor(new THREE.Color(0xEEEEEE, 1.0));
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMapEnabled = true;
+var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+scene.add(ambientLight);
 
-        // create the ground plane
-        var planeGeometry = new THREE.PlaneGeometry(60,40,1,1);
-        var planeMaterial =    new THREE.MeshLambertMaterial({color: 0xffffff});
-        var plane = new THREE.Mesh(planeGeometry,planeMaterial);
-        plane.receiveShadow  = true;
-
-        // rotate and position the plane
-        plane.rotation.x=-0.5*Math.PI;
-        plane.position.x=0
-        plane.position.y=0
-        plane.position.z=0
-
-        // add the plane to the scene
-        scene.add(plane);
-
-        // position and point the camera to the center of the scene
-        camera.position.x = -30;
-        camera.position.y = 40;
-        camera.position.z = 30;
-        camera.lookAt(scene.position);
-
-        // add subtle ambient lighting
-        var ambientLight = new THREE.AmbientLight(0x0c0c0c);
-        scene.add(ambientLight);
-
-        // add spotlight for the shadows
-        var spotLight = new THREE.SpotLight( 0xffffff );
-        spotLight.position.set( -40, 60, -10 );
-        spotLight.castShadow = true;
-        scene.add( spotLight );
-
-        // add the output of the renderer to the html element
-        document.body.appendChild(renderer.domElement);
-
-        // call the render function
-        var step=0;
-
-        var controls = new function() {
-            this.rotationSpeed = 0.02;
-            this.numberOfObjects = scene.children.length;
-
-            this.removeCube = function() {
-                var allChildren = scene.children;
-                var lastObject = allChildren[allChildren.length-1];
-                if (lastObject instanceof THREE.Mesh) {
-                    scene.remove(lastObject);
-                    this.numberOfObjects = scene.children.length;
-                }
-            }
-
-            this.addCube = function() {
-
-                var cubeSize = Math.ceil((Math.random() * 3));
-                var cubeGeometry = new THREE.CubeGeometry(cubeSize,cubeSize,cubeSize);
-                var cubeMaterial = new THREE.MeshLambertMaterial({color:  Math.random() * 0xffffff });
-                var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-                cube.castShadow = true;
-                cube.name = "cube-" + scene.children.length;
+var spotLight = new THREE.SpotLight(0xffffff);
+spotLight.position.set(-40, 60, -10);
+spotLight.castShadow = true;
+scene.add(spotLight);
 
 
-                // position the cube randomly in the scene
-                cube.position.x=-30 + Math.round((Math.random() * planeGeometry.parameters.width));
-                cube.position.y= Math.round((Math.random() * 5));
-                cube.position.z=-20 + Math.round((Math.random() * planeGeometry.parameters.height));
+var axis = new THREE.AxisHelper(100);
+scene.add(axis);
 
-                // add the cube to the scene
-                scene.add(cube);
-                this.numberOfObjects = scene.children.length;
-            };
+document.body.appendChild(renderer.domElement);
 
-            this.outputObjects = function() {
-                console.log(scene.children);
-            }
+var stats = new Stats();
+stats.domElement.style.position = 'absolute';
+stats.domElement.style.left = 0;
+stats.domElement.style.top = 0;
+document.body.appendChild(stats.domElement);
+
+var Control = function() {
+    this.rotationSpeed = 0.01;
+    this.objectCnt = scene.children.length;
+    this.addCube = function() {
+        var cubeSize = Math.random() * (10 - 5) + 5;
+        var tempCubeGeometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+        var tempCubeMaterial = new THREE.MeshLambertMaterial({
+            color: 0xffffff * Math.random()
+        });
+        var tempCube = new THREE.Mesh(tempCubeGeometry, tempCubeMaterial);
+        tempCube.name = 'cube-' + scene.children.length;
+        tempCube.position.x = Math.random() * (30 - (-30)) + (-30);
+        tempCube.position.y = Math.random() * (5 - 2) + 2;;
+        tempCube.position.z = Math.random() * (20 - (-20)) + (-20);
+        scene.add(tempCube);
+        this.objectCnt = scene.children.length;
+    };
+    this.removeLastCube = function() {
+        var allChildren = scene.children;
+        var lastChild = allChildren[allChildren.length - 1];
+        if (lastChild instanceof THREE.Mesh && lastChild != plane) {
+            scene.remove(lastChild);
+            this.objectCnt = scene.children.length;
         }
+    };
+    this.logObj = function() {
+        console.log(scene.children);
+    };
 
-        var gui = new dat.GUI();
-        gui.add(controls, 'rotationSpeed',0,0.5);
-        gui.add(controls, 'addCube');
-        gui.add(controls, 'removeCube');
-        gui.add(controls, 'outputObjects');
-        gui.add(controls, 'numberOfObjects').listen();
+}
 
-        render();
+var control = new Control();
+var gui = new dat.GUI();
+gui.add(control, 'rotationSpeed', 0, 0.1);
+gui.add(control, 'objectCnt');
+gui.add(control, 'addCube');
+gui.add(control, 'removeLastCube');
+gui.add(control, 'logObj');
 
-        function render() {
-            stats.update();
+refresh();
 
-            // rotate the cubes around its axes
-            scene.traverse(function(e) {
-                if (e instanceof THREE.Mesh && e != plane ) {
+function refresh() {
 
-                    e.rotation.x+=controls.rotationSpeed;
-                    e.rotation.y+=controls.rotationSpeed;
-                    e.rotation.z+=controls.rotationSpeed;
-                }
-            });
-
-            // render using requestAnimationFrame
-            requestAnimationFrame(render);
-            renderer.render(scene, camera);
+    stats.update();
+    scene.traverse(function(e) {
+        if (e instanceof THREE.Mesh && e != plane) {
+            e.rotation.x += control.rotationSpeed;
+            e.rotation.y += control.rotationSpeed;
         }
-
-        function initStats() {
-
-            var stats = new Stats();
-
-            stats.setMode(0); // 0: fps, 1: ms
-
-            // Align top-left
-            stats.domElement.style.position = 'absolute';
-            stats.domElement.style.left = '0px';
-            stats.domElement.style.top = '0px';
-
-            document.body.appendChild( stats.domElement );
-
-            return stats;
-        }
+    })
+    renderer.render(scene, camera);
+    requestAnimationFrame(refresh);
+}
