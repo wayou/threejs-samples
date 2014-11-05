@@ -87,7 +87,7 @@ function refresh() {
             e.rotation.x += control.rotationSpeed;
             e.rotation.y += control.rotationSpeed;
         }
-    })
+    });
     renderer.render(scene, camera);
     requestAnimationFrame(refresh);
 }
