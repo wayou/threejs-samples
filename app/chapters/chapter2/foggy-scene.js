@@ -1,9 +1,10 @@
 var scene = new THREE.Scene();
-scene.fog=new THREE.FogExp( 0x999999, 1.2 );
+scene.fog=new THREE.FogExp2( 0x888888,0.01);
+// scene.fog=new THREE.Fog( 0xaaaaaa,0.01,1000);
 var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
 camera.position.x = -40;
-camera.position.y = 100;
-camera.position.z = 70;
+camera.position.y = 50;
+camera.position.z = 50;
 camera.lookAt(scene.position);
 
 var renderer = new THREE.WebGLRenderer();
